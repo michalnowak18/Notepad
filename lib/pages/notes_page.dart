@@ -40,16 +40,22 @@ class _NotesPageState extends State<NotesPage> {
         backgroundColor: Colors.brown.shade900,
         title: Text("Notes"),
       ),
-      body: isLoading
-          ? CircularProgressIndicator()
-          : notes.isEmpty
-              ? Text("No notes")
-              : buildNotes(),
+      body: Center(
+        child: isLoading
+            ? CircularProgressIndicator()
+            : notes.isEmpty
+                ? Text(
+                    "No notes yet, add one!",
+                    style: TextStyle(color: Colors.white, fontSize: 24),
+                  )
+                : buildNotes(),
+      ),
       floatingActionButton: FloatingActionButton(
           onPressed: () async {
             await Navigator.of(context).push(
               MaterialPageRoute(builder: (context) => AddEditNotePage()),
             );
+            refreshNotes();
           },
           backgroundColor: Colors.brown.shade900,
           child: Icon(
