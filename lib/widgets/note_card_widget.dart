@@ -15,6 +15,11 @@ class NoteCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      margin: EdgeInsets.all(15),
+      color: Colors.brown.shade700,
       child: Padding(
         padding: const EdgeInsets.only(top: 30.0, bottom: 30.0, left: 13.0, right: 22.0),
         child: Column(
@@ -43,6 +48,7 @@ class _NoteTitle extends StatelessWidget {
       style: TextStyle(
         fontSize: 25,
         fontWeight: FontWeight.bold,
+        color: Colors.white,
       ),
     );
   }
@@ -56,7 +62,7 @@ class _NoteText extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       _text,
-      style: TextStyle(color: Colors.grey.shade600),
+      style: TextStyle(color: Colors.grey.shade400),
       maxLines: 2,
       overflow: TextOverflow.ellipsis,
     );

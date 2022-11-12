@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:notepad/inherited_widgets/note_inherited_widget.dart';
-import 'package:notepad/view/note_list.dart';
+import 'package:notepad/pages/notes_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -9,14 +8,22 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
+  static final String title = 'Notepad';
   @override
   Widget build(BuildContext context) {
-    return NoteInheritedWidget(
-      const MaterialApp(
-        title: 'Flutter Demo',
-        home: NoteList(),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: title,
+      themeMode: ThemeMode.dark,
+      theme: ThemeData(
+        primaryColor: Colors.black54,
+        scaffoldBackgroundColor: Colors.grey.shade900,
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+        ),
       ),
+      home: NotesPage(),
     );
   }
 }

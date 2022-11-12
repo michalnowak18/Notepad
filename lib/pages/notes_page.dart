@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:notepad/pages/note_card_widget.dart';
+import 'package:notepad/widgets/note_card_widget.dart';
 
-import 'note.dart';
+import '../db/database_provider.dart';
+import '../model/note.dart';
+import 'add_edit_note_page.dart';
+import 'note_detail_page.dart';
 
-class NoteList extends StatefulWidget {
+class NotesPage extends StatefulWidget {
   @override
-  State<NoteList> createState() => _NoteListState();
+  State<NotesPage> createState() => _NotesPageState();
 }
 
-class _NoteListState extends State<NoteList> {
+class _NotesPageState extends State<NotesPage> {
   late List<Note> notes;
   bool isLoading = false;
 
@@ -20,13 +23,13 @@ class _NoteListState extends State<NoteList> {
 
   @override
   void dispose() {
-    NoteDatabase.instance.close();
+    DatabaseProvider.instance.close();
     super.dispose();
   }
 
   Future refreshNotes() async {
     setState(() => isLoading = true);
-    this.notes = await NotesDatabase.instance.readAllNotes();
+    this.notes = await DatabaseProvider.instance.readAllNotes();
     setState(() => isLoading = false);
   }
 
@@ -34,7 +37,7 @@ class _NoteListState extends State<NoteList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.orange.shade600,
+        backgroundColor: Colors.brown.shade900,
         title: Text("Notes"),
       ),
       body: isLoading
@@ -43,13 +46,15 @@ class _NoteListState extends State<NoteList> {
               ? Text("No notes")
               : buildNotes(),
       floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => Note(ModType.ADD, 0)),
+          onPressed: () async {
+            await Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => AddEditNotePage()),
             );
           },
-          child: Icon(Icons.add)),
+          backgroundColor: Colors.brown.shade900,
+          child: Icon(
+            Icons.edit_outlined,
+          )),
     );
   }
 
@@ -73,35 +78,4 @@ class _NoteListState extends State<NoteList> {
           );
         },
       );
-}
-
-class _NoteTitle extends StatelessWidget {
-  final String _title;
-  const _NoteTitle(this._title);
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      _title,
-      style: TextStyle(
-        fontSize: 25,
-        fontWeight: FontWeight.bold,
-      ),
-    );
-  }
-}
-
-class _NoteText extends StatelessWidget {
-  const _NoteText(this._text);
-  final String _text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      _text,
-      style: TextStyle(color: Colors.grey.shade600),
-      maxLines: 2,
-      overflow: TextOverflow.ellipsis,
-    );
-  }
 }
