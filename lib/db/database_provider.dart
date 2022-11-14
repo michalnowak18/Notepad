@@ -71,6 +71,11 @@ class DatabaseProvider {
     return result.map((json) => Note.fromJson(json)).toList();
   }
 
+  Future<int> deleteAll() async {
+    final db = await instance.database;
+    return db.delete(notesTableName);
+  }
+
   Future close() async {
     final db = await instance.database;
     db.close();

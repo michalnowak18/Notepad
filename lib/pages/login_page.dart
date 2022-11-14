@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:notepad/pages/notes_page.dart';
 
+import '../db/database_provider.dart';
 import '../utils/password_secure_storage.dart';
 import '../widgets/login_form_widget.dart';
 
@@ -17,6 +18,7 @@ class _LoginPageState extends State<LoginPage> {
   bool isLoading = false;
   late String typedPassword = '';
   late String? savedEncryptedPassword;
+  int failedAttempts = 0;
 
   @override
   void initState() {
@@ -28,6 +30,7 @@ class _LoginPageState extends State<LoginPage> {
     setState(() => isLoading = true);
     savedEncryptedPassword = await PasswordSecureStorage.getPassword();
     setState(() => isFirstLogin = savedEncryptedPassword == '');
+    failedAttempts = await PasswordSecureStorage.getFailedAttempts();
     setState(() => isLoading = false);
   }
 
@@ -92,8 +95,31 @@ class _LoginPageState extends State<LoginPage> {
     if (isValid) {
       if (typedPassword == savedEncryptedPassword) {
         await PasswordSecureStorage.setPassword('');
+        await PasswordSecureStorage.setFailedAttempts(0);
+        refresh();
+        return;
+      }
+      setState(() => failedAttempts += 1);
+      await PasswordSecureStorage.setFailedAttempts(failedAttempts);
+      if (failedAttempts == 3) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Wrong password has been typed 3 times - wiping all data."),
+            duration: Duration(milliseconds: 3000),
+          ),
+        );
+        await PasswordSecureStorage.setPassword('');
+        await PasswordSecureStorage.setFailedAttempts(0);
+        DatabaseProvider.instance.deleteAll();
         refresh();
       }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Wrong password. To reset the password you have to type the old one first!"
+              " Failed attempts: $failedAttempts/3"),
+          duration: Duration(milliseconds: 5000),
+        ),
+      );
     }
   }
 
@@ -107,18 +133,34 @@ class _LoginPageState extends State<LoginPage> {
           Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => NotesPage(),
           ));
+          await PasswordSecureStorage.setFailedAttempts(0);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text("Successful login"),
               duration: Duration(milliseconds: 1000),
             ),
           );
+          refresh();
           return;
+        }
+        setState(() => failedAttempts += 1);
+        await PasswordSecureStorage.setFailedAttempts(failedAttempts);
+        if (failedAttempts == 3) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Wrong password has been typed 3 times - wiping all data."),
+              duration: Duration(milliseconds: 5000),
+            ),
+          );
+          await PasswordSecureStorage.setPassword('');
+          await PasswordSecureStorage.setFailedAttempts(0);
+          DatabaseProvider.instance.deleteAll();
+          refresh();
         }
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("Wrong password"),
-            duration: Duration(milliseconds: 1000),
+            content: Text("Wrong password. Failed attempts: $failedAttempts/3"),
+            duration: Duration(milliseconds: 3000),
           ),
         );
         return;
