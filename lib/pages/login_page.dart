@@ -94,32 +94,15 @@ class _LoginPageState extends State<LoginPage> {
 
     if (isValid) {
       if (typedPassword == savedEncryptedPassword) {
-        await PasswordSecureStorage.setPassword('');
-        await PasswordSecureStorage.setFailedAttempts(0);
-        refresh();
+        resetDataInSecureStorage();
         return;
       }
-      setState(() => failedAttempts += 1);
-      await PasswordSecureStorage.setFailedAttempts(failedAttempts);
+      incrementFailedAttempts();
       if (failedAttempts == 3) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Wrong password has been typed 3 times - wiping all data."),
-            duration: Duration(milliseconds: 3000),
-          ),
-        );
-        await PasswordSecureStorage.setPassword('');
-        await PasswordSecureStorage.setFailedAttempts(0);
-        DatabaseProvider.instance.deleteAll();
-        refresh();
+        wipeAllData();
+        return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Wrong password. To reset the password you have to type the old one first!"
-              " Failed attempts: $failedAttempts/3"),
-          duration: Duration(milliseconds: 5000),
-        ),
-      );
+      showWrongPasswordMessage();
     }
   }
 
@@ -130,47 +113,74 @@ class _LoginPageState extends State<LoginPage> {
     if (isValid) {
       if (!isFirstLogin) {
         if (typedPassword == savedEncryptedPassword) {
-          Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => NotesPage(),
-          ));
           await PasswordSecureStorage.setFailedAttempts(0);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text("Successful login"),
-              duration: Duration(milliseconds: 1000),
-            ),
-          );
-          refresh();
+          moveToNotesPage();
+          showSuccessfulLoginMessage();
           return;
         }
-        setState(() => failedAttempts += 1);
-        await PasswordSecureStorage.setFailedAttempts(failedAttempts);
+        incrementFailedAttempts();
         if (failedAttempts == 3) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text("Wrong password has been typed 3 times - wiping all data."),
-              duration: Duration(milliseconds: 5000),
-            ),
-          );
-          await PasswordSecureStorage.setPassword('');
-          await PasswordSecureStorage.setFailedAttempts(0);
-          DatabaseProvider.instance.deleteAll();
-          refresh();
+          wipeAllData();
+          return;
         }
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Wrong password. Failed attempts: $failedAttempts/3"),
-            duration: Duration(milliseconds: 3000),
-          ),
-        );
+        showWrongPasswordMessage();
         return;
       }
 
       await PasswordSecureStorage.setPassword(typedPassword);
-      refresh();
-      Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => NotesPage(),
-      ));
+      moveToNotesPage();
     }
+  }
+
+  void resetDataInSecureStorage() async {
+    await PasswordSecureStorage.setPassword('');
+    await PasswordSecureStorage.setFailedAttempts(0);
+    refresh();
+  }
+
+  void wipeAllData() async {
+    showWipingDataMessage();
+    DatabaseProvider.instance.deleteAll();
+    resetDataInSecureStorage();
+  }
+
+  void incrementFailedAttempts() async {
+    setState(() => failedAttempts += 1);
+    await PasswordSecureStorage.setFailedAttempts(failedAttempts);
+  }
+
+  void moveToNotesPage() async {
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (context) => NotesPage(),
+    ));
+    refresh();
+  }
+
+  void showWrongPasswordMessage() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("Wrong password. To reset the password type the old one."
+            " Failed attempts: $failedAttempts/3"),
+        duration: Duration(milliseconds: 5000),
+      ),
+    );
+  }
+
+  void showWipingDataMessage() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("Wrong password has been typed 3 times - wiping all data."),
+        duration: Duration(milliseconds: 5000),
+      ),
+    );
+  }
+
+  void showSuccessfulLoginMessage() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("Successful login"),
+        duration: Duration(milliseconds: 1000),
+      ),
+    );
   }
 }
