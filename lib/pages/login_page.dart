@@ -1,3 +1,4 @@
+import 'package:crypt/crypt.dart';
 import 'package:flutter/material.dart';
 import 'package:notepad/pages/notes_page.dart';
 
@@ -93,7 +94,7 @@ class _LoginPageState extends State<LoginPage> {
     _loginFormKey.currentState?.reset();
 
     if (isValid) {
-      if (typedPassword == savedEncryptedPassword) {
+      if (checkIfEqual()) {
         resetDataInSecureStorage();
         return;
       }
@@ -106,13 +107,22 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  bool checkIfEqual() {
+    String hashedPassword = Crypt.sha512(
+      typedPassword.trim(),
+      rounds: 10000,
+      salt: "salt",
+    ).toString();
+    return hashedPassword == savedEncryptedPassword;
+  }
+
   void validateLogin() async {
     final isValid = _loginFormKey.currentState!.validate();
     _loginFormKey.currentState?.reset();
 
     if (isValid) {
       if (!isFirstLogin) {
-        if (typedPassword == savedEncryptedPassword) {
+        if (checkIfEqual()) {
           await PasswordSecureStorage.setFailedAttempts(0);
           moveToNotesPage();
           showSuccessfulLoginMessage();
