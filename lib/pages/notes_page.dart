@@ -23,7 +23,6 @@ class _NotesPageState extends State<NotesPage> {
 
   @override
   void dispose() {
-    DatabaseProvider.instance.close();
     super.dispose();
   }
 

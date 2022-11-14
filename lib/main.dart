@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:notepad/pages/notes_page.dart';
+import 'package:notepad/pages/login_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
           elevation: 0,
         ),
       ),
-      home: NotesPage(),
+      home: LoginPage(),
     );
   }
 }
