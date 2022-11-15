@@ -39,11 +39,13 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.brown.shade900,
         title: Text("Login page"),
       ),
       body: isLoading
           ? CircularProgressIndicator()
           : Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Form(
                   key: _loginFormKey,
@@ -72,16 +74,18 @@ class _LoginPageState extends State<LoginPage> {
             child: isFirstLogin ? Text("Register") : Text("Login"),
             onPressed: validateLogin,
             style: ElevatedButton.styleFrom(
+              shape: StadiumBorder(),
               foregroundColor: Colors.white,
-              backgroundColor: isValid ? null : Colors.grey.shade700,
+              backgroundColor: isValid ? Colors.brown.shade700 : Colors.grey.shade700,
             ),
           ),
           ElevatedButton(
             onPressed: isFirstLogin ? null : resetPassword,
             child: Text("Reset password"),
             style: ElevatedButton.styleFrom(
+              shape: StadiumBorder(),
               foregroundColor: Colors.white,
-              backgroundColor: isValid ? null : Colors.grey.shade700,
+              backgroundColor: isValid ? Colors.brown.shade700 : Colors.grey.shade700,
             ),
           ),
         ],
@@ -99,7 +103,7 @@ class _LoginPageState extends State<LoginPage> {
         return;
       }
       incrementFailedAttempts();
-      if (failedAttempts == 3) {
+      if (failedAttempts >= 3) {
         wipeAllData();
         return;
       }
@@ -129,7 +133,7 @@ class _LoginPageState extends State<LoginPage> {
           return;
         }
         incrementFailedAttempts();
-        if (failedAttempts == 3) {
+        if (failedAttempts >= 3) {
           wipeAllData();
           return;
         }
@@ -151,6 +155,7 @@ class _LoginPageState extends State<LoginPage> {
   void wipeAllData() async {
     showWipingDataMessage();
     DatabaseProvider.instance.deleteAll();
+    await PasswordSecureStorage.setSecretKey();
     resetDataInSecureStorage();
   }
 

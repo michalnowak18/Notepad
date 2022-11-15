@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:crypt/crypt.dart';
+import 'package:encrypt/encrypt.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class PasswordSecureStorage {
@@ -12,7 +15,7 @@ class PasswordSecureStorage {
       rounds: 10000,
       salt: "salt",
     ).toString();
-    return await _storage.write(key: _keyPassword, value: hashedPassword);
+    return await _storage.write(key: _keyPassword, value: password == '' ? password : hashedPassword);
   }
 
   static Future<String?> getPassword() async {
@@ -28,5 +31,14 @@ class PasswordSecureStorage {
       return 0;
     }
     return int.parse(val);
+  }
+
+  static Future<Key> getSecretKey() async {
+    String? encodedKey = await _storage.read(key: 'secret_key');
+    return Key(base64Decode(encodedKey!));
+  }
+
+  static Future setSecretKey() async {
+    await _storage.write(key: 'secret_key', value: Key.fromSecureRandom(32).base64);
   }
 }

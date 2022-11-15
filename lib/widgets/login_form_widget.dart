@@ -10,15 +10,15 @@ class LoginFormWidget extends StatelessWidget {
     return Container(
       child: Padding(
         padding: EdgeInsets.all(16),
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          buildPassword(),
-        ]),
+        child: buildPassword(),
       ),
     );
   }
 
   Widget buildPassword() {
     return TextFormField(
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      obscureText: true,
       maxLines: 1,
       style: TextStyle(
         color: Colors.white70,
@@ -26,11 +26,36 @@ class LoginFormWidget extends StatelessWidget {
         fontSize: 24,
       ),
       decoration: InputDecoration(
-        border: InputBorder.none,
+        filled: true,
+        fillColor: Colors.brown.shade700,
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25.0),
+          borderSide: BorderSide(color: Colors.brown.shade700, width: 3.0),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25.0),
+          borderSide: BorderSide(color: Colors.brown.shade700, width: 3.0),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25.0),
+          borderSide: BorderSide(color: Colors.red.shade900, width: 3.0),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25.0),
+          borderSide: BorderSide(color: Colors.red.shade900, width: 3.0),
+        ),
+        border: OutlineInputBorder(),
         hintText: 'Password',
         hintStyle: TextStyle(color: Colors.white70),
       ),
-      validator: (password) => password != null && password.isEmpty ? 'Password cannot be empty' : null,
+      validator: (password) {
+        if (password != null && password.isEmpty) {
+          return 'Password cannot be empty';
+        } else if (password!.length < 6) {
+          return 'Password must be of minimum 6 characters';
+        }
+        return null;
+      },
       onChanged: onChangedPassword,
     );
   }

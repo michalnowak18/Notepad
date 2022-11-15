@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:notepad/utils/note_encrypter.dart';
+import 'package:notepad/utils/password_secure_storage.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -35,7 +37,9 @@ class DatabaseProvider {
 
   Future<Note> create(Note note) async {
     final db = await instance.database;
-    final id = await db.insert(notesTableName, note.toJson());
+    final noteEncrypter = NoteEncrypter(await PasswordSecureStorage.getSecretKey());
+    final encryptedNote = noteEncrypter.encrypt(note);
+    final id = await db.insert(notesTableName, encryptedNote.toJson());
     return note.copy(id: id);
   }
 
@@ -51,15 +55,19 @@ class DatabaseProvider {
     if (result.isEmpty) {
       throw Exception('Note ID: $noteId not found');
     }
-    return Note.fromJson(result.first);
+    final noteEncrypter = NoteEncrypter(await PasswordSecureStorage.getSecretKey());
+    Note encryptedNote = Note.fromJson(result.first);
+    return noteEncrypter.decrypt(encryptedNote);
   }
 
   Future<int> update(Note note) async {
     final db = await instance.database;
+    final noteEncrypter = NoteEncrypter(await PasswordSecureStorage.getSecretKey());
+    final encryptedNote = noteEncrypter.encrypt(note);
 
     return db.update(
       notesTableName,
-      note.toJson(),
+      encryptedNote.toJson(),
       where: '${NoteFields.id} = ?',
       whereArgs: [note.id],
     );
@@ -68,7 +76,10 @@ class DatabaseProvider {
   Future<List<Note>> readAllNotes() async {
     final db = await instance.database;
     final result = await db.query(notesTableName);
-    return result.map((json) => Note.fromJson(json)).toList();
+    final noteEncrypter = NoteEncrypter(await PasswordSecureStorage.getSecretKey());
+    List<Note> encryptedNotes = result.map((json) => Note.fromJson(json)).toList();
+
+    return encryptedNotes.map((note) => noteEncrypter.decrypt(note)).toList();
   }
 
   Future<int> deleteAll() async {
