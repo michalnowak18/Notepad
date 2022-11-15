@@ -43,7 +43,25 @@ class NoteFormWidget extends StatelessWidget {
         fontSize: 24,
       ),
       decoration: InputDecoration(
-        border: InputBorder.none,
+        filled: true,
+        fillColor: Colors.brown.shade700,
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25.0),
+          borderSide: BorderSide(color: Colors.brown.shade700, width: 3.0),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25.0),
+          borderSide: BorderSide(color: Colors.brown.shade700, width: 3.0),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25.0),
+          borderSide: BorderSide(color: Colors.red.shade900, width: 3.0),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25.0),
+          borderSide: BorderSide(color: Colors.red.shade900, width: 3.0),
+        ),
+        border: OutlineInputBorder(),
         hintText: 'Title',
         hintStyle: TextStyle(color: Colors.white70),
       ),
@@ -60,7 +78,25 @@ class NoteFormWidget extends StatelessWidget {
         color: Colors.white60,
       ),
       decoration: InputDecoration(
-        border: InputBorder.none,
+        filled: true,
+        fillColor: Colors.brown.shade700,
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25.0),
+          borderSide: BorderSide(color: Colors.brown.shade700, width: 3.0),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25.0),
+          borderSide: BorderSide(color: Colors.brown.shade700, width: 3.0),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25.0),
+          borderSide: BorderSide(color: Colors.red.shade900, width: 3.0),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25.0),
+          borderSide: BorderSide(color: Colors.red.shade900, width: 3.0),
+        ),
+        border: OutlineInputBorder(),
         hintText: 'Type some more...',
         hintStyle: TextStyle(color: Colors.white60),
       ),

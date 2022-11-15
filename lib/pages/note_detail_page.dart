@@ -67,6 +67,11 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
 
   Widget editButton() => IconButton(
         icon: Icon(Icons.edit_outlined),
+        style: IconButton.styleFrom(
+          shape: StadiumBorder(),
+          foregroundColor: Colors.white,
+          backgroundColor: Colors.brown.shade700,
+        ),
         onPressed: () async {
           if (isLoading) return;
           await Navigator.of(context).push(MaterialPageRoute(

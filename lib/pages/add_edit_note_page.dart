@@ -59,8 +59,9 @@ class _AddEditNotePageState extends State<AddEditNotePage> {
         child: Text("Save"),
         onPressed: addOrUpdateNote,
         style: ElevatedButton.styleFrom(
+          shape: StadiumBorder(),
           foregroundColor: Colors.white,
-          backgroundColor: isValid ? null : Colors.grey.shade700,
+          backgroundColor: isValid ? Colors.brown.shade700 : Colors.grey.shade700,
         ),
       ),
     );
