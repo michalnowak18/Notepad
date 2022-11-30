@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:notepad/pages/notes_page.dart';
 
 import '../db/database_provider.dart';
+import '../utils/local_auth_api.dart';
 import '../utils/password_secure_storage.dart';
 import '../widgets/login_form_widget.dart';
 
@@ -67,25 +68,40 @@ class _LoginPageState extends State<LoginPage> {
         vertical: 8,
         horizontal: 12,
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      child: Column(
         children: [
-          ElevatedButton(
-            child: isFirstLogin ? Text("Register") : Text("Login"),
-            onPressed: validateLogin,
-            style: ElevatedButton.styleFrom(
-              shape: StadiumBorder(),
-              foregroundColor: Colors.white,
-              backgroundColor: isValid ? Colors.brown.shade700 : Colors.grey.shade700,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
+                child: isFirstLogin ? Text("Register") : Text("Login"),
+                onPressed: validateLogin,
+                style: ElevatedButton.styleFrom(
+                  shape: StadiumBorder(),
+                  foregroundColor: Colors.white,
+                  backgroundColor: isValid ? Colors.brown.shade700 : Colors.grey.shade700,
+                ),
+              ),
+              ElevatedButton(
+                onPressed: isFirstLogin ? null : resetPassword,
+                child: Text("Reset password"),
+                style: ElevatedButton.styleFrom(
+                  shape: StadiumBorder(),
+                  foregroundColor: Colors.white,
+                  backgroundColor: isValid ? Colors.brown.shade700 : Colors.grey.shade700,
+                ),
+              ),
+            ],
           ),
           ElevatedButton(
-            onPressed: isFirstLogin ? null : resetPassword,
-            child: Text("Reset password"),
+            onPressed: isFirstLogin ? null : authenticate,
+            child: Text(
+              "Login with fingerprint",
+            ),
             style: ElevatedButton.styleFrom(
               shape: StadiumBorder(),
               foregroundColor: Colors.white,
-              backgroundColor: isValid ? Colors.brown.shade700 : Colors.grey.shade700,
+              backgroundColor: Colors.brown.shade700,
             ),
           ),
         ],
@@ -197,5 +213,12 @@ class _LoginPageState extends State<LoginPage> {
         duration: Duration(milliseconds: 1000),
       ),
     );
+  }
+
+  void authenticate() async {
+    final isAuthenticated = await LocalAuthApi.authenticate();
+    if (isAuthenticated) {
+      moveToNotesPage();
+    }
   }
 }
